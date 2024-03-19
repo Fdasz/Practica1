@@ -13,12 +13,13 @@ copySavedPoints = []
 while True:
     # Lee un fotograma de la cámara
     ret, frame = image1.read()
-    edges = cv2.Canny(frame,minCani,maxCani)
+    
+    
     img_gray1 = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
- 
     ret, thresh1 = cv2.threshold(img_gray1, 150, 255, cv2.THRESH_BINARY)
-    th = cv2.medianBlur(thresh1, 7)
-    contours2, hierarchy2 = cv2.findContours(th, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
+    th = gaussiana = cv2.GaussianBlur(thresh1, (5,5), 0)
+    edges = cv2.Canny(th,minCani,maxCani)
+    contours2, hierarchy2 = cv2.findContours(edges, cv2.RETR_TREE,cv2.CHAIN_APPROX_SIMPLE)
     image_copy2 = frame
     cv2.drawContours(image_copy2, contours2, -1, (0, 255, 0), 2, cv2.LINE_AA)
     image_copy3 = frame
@@ -32,13 +33,13 @@ while True:
     cara = 'minCani: '+str(minCani)
     mesa = 'maxCani: '+ str(maxCani)
     
-    for c in contours2:
-      area = cv2.contourArea(c)
-      peri = cv2.arcLength(c, True)
-      approx = cv2.approxPolyDP(c, 0.02*peri, True)
-      if area >= 200 and area <= 2000:
-        if len(approx) == 4:
-            cv2.drawContours(image_copy3, [approx], -1, (255, 0, 0), 2, cv2.LINE_AA)
+    #for c in contours2:
+    #  area = cv2.contourArea(c)
+    #  peri = cv2.arcLength(c, True)
+    #  approx = cv2.approxPolyDP(c, 0.02*peri, True)
+    #  if area >= 200 and area <= 2000:
+    #    if len(approx) == 4:
+    #        cv2.drawContours(image_copy3, [approx], -1, (255, 0, 0), 2, cv2.LINE_AA)
     
     
     def dibujando(event, x, y, flags, param):
@@ -85,12 +86,13 @@ while True:
                     
                 disComp = calcular_distancia(point[0], punto[0])
                 dis = calcular_distancia(point[0],circle)
-                if disComp <= 10:
+
+                if disComp <= 5:
                     cv2.circle(image_copy3, punto[0], 10, (0, 0, 255), -1)
                     copySavedPoints[index] = tuple(point[0])
                         
                     break
-                if dis >= -10 and dis < 10:
+                if dis <= 7:
                     cv2.circle(image_copy3, tuple(point[0]), 10, (0, 0, 255), -1)
                     punto.remove(punto[0])
                     punto.append(tuple(point[0]))
@@ -103,12 +105,12 @@ while True:
     cv2.namedWindow('CHAIN_APPROX_SIMPLE Point only')
     cv2.setMouseCallback('CHAIN_APPROX_SIMPLE Point only',dibujando)
     
-    cv2.drawContours(image_copy3, [approx], -1, (255, 0, 0), 2, cv2.LINE_AA)
-    cv2.putText(image_copy3,"perimetro: " + str(peri),(10,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2,cv2.LINE_AA)
+    #cv2.drawContours(image_copy3, [approx], -1, (255, 0, 0), 2, cv2.LINE_AA)
+    cv2.putText(image_copy3,"perimetro: " + "{:.3f}".format(peri),(10,50),cv2.FONT_HERSHEY_SIMPLEX,1,(0,0,255),2,cv2.LINE_AA)
     cv2.putText(image_copy3, mesa, (10, 150), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     cv2.putText(image_copy3, cara, (10, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     cv2.imshow('CHAIN_APPROX_SIMPLE Point only', image_copy3)
-    cv2.imshow('otro', thresh1)
+    cv2.imshow('otro', edges)
 
     #aumenta y disminuye los valores de min/max de las variables de canny
     k = cv2.waitKey(5) & 0xFF
@@ -130,3 +132,4 @@ while True:
         break
 
 image1.release()
+cv2.destroyAllWindows()
