@@ -1,5 +1,8 @@
 from tkinter import *
 from tkinter import ttk
+import cv2
+import numpy as np
+import math
 
 # Código lobby
 lobby = Tk()
@@ -7,14 +10,47 @@ lobby.title("Primera lobby")
 lobby.geometry("450x200")
 lobby.resizable(1, 1)
 
+def camaraRapida(opcion_grilla, opcion_tiempo, opcion_probeta):
+    opcion_probeta = int(opcion_probeta)  # Convertir opcion_probeta a entero
+
+    if opcion_probeta < 0:
+        print("Error al seleccionar la probeta")
+        exit()
+        
+    # Escribir los valores en un archivo de texto
+    with open("datos_romper.txt", "w") as archivo:
+        archivo.write("Tamaño de la grilla seleccionado: {}\n".format(opcion_grilla))
+        archivo.write("Tiempo de muestreo seleccionado: {}\n".format(opcion_tiempo))
+        archivo.write("Probeta seleccionada: {}\n".format(opcion_probeta))
+
+    print("Datos guardados en 'datos_romper.txt'")
+
+    #Camara parte 3 ventana
+
+
+def camaraLenta(opcion_grilla, opcion_tiempo, opcion_probeta):
+    opcion_probeta = int(opcion_probeta)  # Convertir opcion_probeta a entero
+
+    if opcion_probeta < 0:
+        print("Error al seleccionar la probeta")
+        exit()
+        
+    # Escribir los valores en un archivo de texto
+    with open("datos_crecer.txt", "w") as archivo:
+        archivo.write("Tamaño de la grilla seleccionado: {}\n".format(opcion_grilla))
+        archivo.write("Tiempo de muestreo seleccionado: {}\n".format(opcion_tiempo))
+        archivo.write("Probeta seleccionada: {}\n".format(opcion_probeta))
+
+    print("Datos guardados en 'datos_crecer.txt'")
+
+    ventanaCrecer = Toplevel(lobby)
+    ventanaCrecer.title("Crecer")
+    ventanaCrecer.geometry("300x400")
+
 def abrir_ventanaCrecer():
     ventanaCrecer = Toplevel(lobby)
     ventanaCrecer.title("Crecer")
-    ventanaCrecer.geometry("300x300")
-
-    def seleccionar_opcion(event, combobox):
-        seleccion = combobox.get()
-        print("Opción seleccionada:", seleccion)
+    ventanaCrecer.geometry("300x400")
 
     # Texto 1
     texto1 = Label(ventanaCrecer, text="Tamaño de la grilla")
@@ -22,7 +58,7 @@ def abrir_ventanaCrecer():
 
     # Combobox 1
     combobox1 = ttk.Combobox(ventanaCrecer, values=["Opción 1", "Opción 2", "Opción 3", "Opción 4"])
-    combobox1.bind("<<ComboboxSelected>>", lambda event: seleccionar_opcion(event, combobox1))
+
     combobox1.grid(row=1, column=5, padx=(75,0), pady=15)
 
     # Texto 2
@@ -31,21 +67,21 @@ def abrir_ventanaCrecer():
 
     # Combobox 2
     combobox2 = ttk.Combobox(ventanaCrecer, values=["Opción A", "Opción B", "Opción C", "Opción D"])
-    combobox2.bind("<<ComboboxSelected>>", lambda event: seleccionar_opcion(event, combobox2))
     combobox2.grid(row=3, column=5, padx=(75,0), pady=15)
 
-    siguiente_button = Button(ventanaCrecer, text="Siguiente", command=camaraLenta)
-    siguiente_button.grid(row=4, column=5, padx=(75,0), pady=15)
+    etiqueta_probeta = Label(ventanaCrecer, text="Probeta")
+    etiqueta_probeta.grid(row=4, column=5, padx=(75,0), pady=15)
+
+    entrada_probeta = Entry(ventanaCrecer)
+    entrada_probeta.grid(row=5, column=5, padx=(75,0), pady=15)
+
+    siguiente_button = Button(ventanaCrecer, text="Siguiente", command=lambda: camaraLenta(combobox1.get(), combobox2.get(), entrada_probeta.get()))
+    siguiente_button.grid(row=6, column=5, padx=(75,0), pady=15)
 
 def abrir_ventanaRomper():
-    global ventanaRomper
     ventanaRomper = Toplevel(lobby)
     ventanaRomper.title("Romper")
-    ventanaRomper.geometry("300x300")
-
-    def seleccionar_opcion(event, combobox):
-        seleccion = combobox.get()
-        print("Opción seleccionada:", seleccion)
+    ventanaRomper.geometry("300x400")
 
     # Texto 1
     texto1 = Label(ventanaRomper, text="Tamaño de la grilla")
@@ -53,7 +89,6 @@ def abrir_ventanaRomper():
 
     # Combobox 1
     combobox1 = ttk.Combobox(ventanaRomper, values=["Opción 1", "Opción 2", "Opción 3", "Opción 4"])
-    combobox1.bind("<<ComboboxSelected>>", lambda event: seleccionar_opcion(event, combobox1))
     combobox1.grid(row=1, column=0, padx=(75,0), pady=15)
 
     # Texto 2
@@ -62,20 +97,17 @@ def abrir_ventanaRomper():
 
     # Combobox 2
     combobox2 = ttk.Combobox(ventanaRomper, values=["Opción A", "Opción B", "Opción C", "Opción D"])
-    combobox2.bind("<<ComboboxSelected>>", lambda event: seleccionar_opcion(event, combobox2))
     combobox2.grid(row=3, column=0, padx=(75,0), pady=15)
-    
-    siguiente_button = Button(ventanaRomper, text="Siguiente", command=camaraRapida)
-    siguiente_button.grid(row=4, column=0, padx=(75,0), pady=15)
 
-def camaraRapida():
-    print("prueba")
-    ##codigo de la camara rapida se abre desde romper
-    
-def camaraLenta():
-    print("prueba camara 2")
-    ##codigo camara lenta se abre desde crecer
-    
+    etiqueta_probeta = Label(ventanaRomper, text="Probeta")
+    etiqueta_probeta.grid(row=4, column=0, padx=(75,0), pady=15)
+
+    entrada_probeta = Entry(ventanaRomper)
+    entrada_probeta.grid(row=5, column=0, padx=(75,0), pady=15)
+
+    siguiente_button = Button(ventanaRomper, text="Siguiente", command=lambda: camaraRapida(combobox1.get(), combobox2.get(), entrada_probeta.get()))
+    siguiente_button.grid(row=6, column=0, padx=(75,0), pady=15)
+
 def abrir_siguiente_ventana(ventana_actual, siguiente_ventana=None):
     if siguiente_ventana:
         ventana_actual.withdraw()  # Ocultar la ventana actual
