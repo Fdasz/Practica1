@@ -21,11 +21,17 @@ d2 = True
 d3 = True
 d4 = True
 complete = True
+pxm = 0
 
 def pixelsxmilimetros(d):
-    global espacioGrilla
-    largo = (d*espacioGrilla)/d
-    return largo
+    global espacioGrilla, pxm
+    pxm = espacioGrilla/d
+    return pxm
+
+def calcularMM(d):
+    global pxm
+    mm = pxm * d
+    return mm
 
 def calcular_distancia(punto1, punto2):
     x1, y1 = punto1
@@ -49,22 +55,26 @@ def dibujarLineas(image_copy3,copySavedPoint):
     font = cv2.FONT_HERSHEY_SIMPLEX
     global d1,d2,d3,d4,complete
     if len(copySavedPoint) == 2 and d1:
-        distancia = calcular_distancia(copySavedPoint[0], copySavedPoint[1])
-        distancias.append((copySavedPoint[0],copySavedPoint[1],distancia))
+        distancia = calcular_distancia(copySavedPoint[0], copySavedPoint[1])        
         ancho = pixelsxmilimetros(distancia)
+        mm = calcularMM(distancia)
+        distancias.append((copySavedPoint[0],copySavedPoint[1],mm))
         print(ancho)
         d1 = False
     elif len(copySavedPoint) == 4 and d2:
         distancia = calcular_distancia(copySavedPoint[2], copySavedPoint[3])
-        distancias.append((copySavedPoint[2],copySavedPoint[3],distancia))
+        mm = calcularMM(distancia)
+        distancias.append((copySavedPoint[2],copySavedPoint[3],mm))
         d2 = False
     elif len(copySavedPoint) == 6 and d3:
         distancia = calcular_distancia(copySavedPoint[4], copySavedPoint[5])
-        distancias.append((copySavedPoint[4],copySavedPoint[5],distancia))
+        mm = calcularMM(distancia)
+        distancias.append((copySavedPoint[4],copySavedPoint[5],mm))
         d3 = False
     elif len(copySavedPoint) == 8 and d4:
         distancia = calcular_distancia(copySavedPoint[6], copySavedPoint[7])
-        distancias.append((copySavedPoint[6],copySavedPoint[7],distancia))
+        mm = calcularMM(distancia)
+        distancias.append((copySavedPoint[6],copySavedPoint[7],mm))
         complete = False
         d4 = False
 
