@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import math
+import time 
 #Inicia la captura de la camara
 cap = cv2.VideoCapture(0)
 #Medidas de grilla, pixeles x distancia ,proximamente modificar
@@ -12,6 +13,7 @@ distancias = []
 inicialPoint = []
 #flag de comprobacion
 complete = True
+experimento = False
 
 #Calcula la relacion pixeles por milimetro en base a una distancia inicial
 def pixelsXmilimetros(d):
@@ -82,7 +84,15 @@ def dibujarLineas(img, diss):
 def dibujarCirculos(pintados,img):
     for circle in pintados:
         cv2.circle(img, circle, 5, (0, 0, 255), -1)
-def iniciarExperimento(corners):
+
+def iniciarExperimento(cruces):
+    global experimento
+    experimento = True
+    with open("datosModa.txt", "a") as archivo:
+        archivo.write(f"{time.time()}}\n")
+        for puntos in cruces:
+            punto1,punto2 = puntos.ravel()
+            archivo.write(f"{punto1},{punto2}\n")
 
 #Ciclo de fotogramas camara programa 
 while cap.isOpened():
@@ -118,6 +128,9 @@ while cap.isOpened():
     if tecla == 27:
         break
     
+    #inicia la toma de muestras y las guarda en un archivo
+    if tecla == ord('i') or experimento:
+        iniciarExperimento(corners)
     # Limpia variables si apretas 'c'
     if tecla == ord('c'):
         savedPoints = []
