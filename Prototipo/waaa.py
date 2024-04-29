@@ -6,6 +6,12 @@ def pixelsxmilimetros(d):
     pxm = espacioGrilla/d
     return pxm
 
+def calcularMM(d):
+    global pxm
+    mm = pxm * d
+    return mm
 
-ancho = pixelsxmilimetros(50)
+
+pixelsxmilimetros(50)
+ancho = calcularMM(545)
 print(ancho)

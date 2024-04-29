@@ -2,26 +2,18 @@ import cv2
 import numpy as np
 import math
 
-
 cap = cv2.VideoCapture(0)
 
-block_size = 2
-aperture_size = 3
-k = 0.04
-
+#Medidas de grilla, pixeles x distancia ,proximamente modificar
 espacioGrilla = 10
-
-savedPoints = []
-savedPointsReserve = []
-copySavedPoints = []
-distancias = []
-liness = 0
-d1 = True
-d2 = True
-d3 = True
-d4 = True
-complete = True
 pxm = 0
+#arr de variables a guardar
+savedPoints = []
+distancias = []
+#flags de comprobacion
+liness = 0
+complete = True
+
 
 def pixelsxmilimetros(d):
     global espacioGrilla, pxm
@@ -32,13 +24,13 @@ def calcularMM(d):
     global pxm
     mm = pxm * d
     return mm
-
+#Calcula la distancia entre 2 puntos
 def calcular_distancia(punto1, punto2):
     x1, y1 = punto1
     x2, y2 = punto2
     distancia = math.sqrt((x2 - x1)**2 + (y2 - y1)**2)
     return distancia
-
+#Guarda la posicion de los puntos(x,y) mas cercano donde se hace click 
 def dibujando(event, x, y, flags, param):
     global liness
     if event == cv2.EVENT_LBUTTONDOWN:
@@ -47,77 +39,30 @@ def dibujando(event, x, y, flags, param):
             distance = calcular_distancia((x,y),esquina)            
             if distance >= -5 and distance <= 5:  # Tolerancia de 10 unidades                
                 if liness < 8:        
-                    savedPointsReserve.append(esquina)
+                    savedPoints.append(esquina)
                     liness += 1
                     break
 
-def dibujarLineas(image_copy3,copySavedPoint):
+def dibujarLineas(puntos):
+    global complete
+    if len(puntos) % 2 == 0 and len(puntos) <= 8:
+        for i in range(0, len(puntos), 2):
+            punto_inicio = puntos[i]
+            punto_fin = puntos[i + 1]
+            distancia = calcular_distancia(punto_inicio, punto_fin)
+            mm = calcularMM(distancia)
+            distancias.append((punto_inicio, punto_fin, mm))
+        
+        if len(distancias) == 4:
+            complete = False
+    
+def dibujarLineasciclo(img, diss):
     font = cv2.FONT_HERSHEY_SIMPLEX
-    global d1,d2,d3,d4,complete
-    if len(copySavedPoint) == 2 and d1:
-        distancia = calcular_distancia(copySavedPoint[0], copySavedPoint[1])        
-        ancho = pixelsxmilimetros(distancia)
-        mm = calcularMM(distancia)
-        distancias.append((copySavedPoint[0],copySavedPoint[1],mm))
-        print(ancho)
-        d1 = False
-    elif len(copySavedPoint) == 4 and d2:
-        distancia = calcular_distancia(copySavedPoint[2], copySavedPoint[3])
-        mm = calcularMM(distancia)
-        distancias.append((copySavedPoint[2],copySavedPoint[3],mm))
-        d2 = False
-    elif len(copySavedPoint) == 6 and d3:
-        distancia = calcular_distancia(copySavedPoint[4], copySavedPoint[5])
-        mm = calcularMM(distancia)
-        distancias.append((copySavedPoint[4],copySavedPoint[5],mm))
-        d3 = False
-    elif len(copySavedPoint) == 8 and d4:
-        distancia = calcular_distancia(copySavedPoint[6], copySavedPoint[7])
-        mm = calcularMM(distancia)
-        distancias.append((copySavedPoint[6],copySavedPoint[7],mm))
-        complete = False
-        d4 = False
-
-def dibujarLineasciclo(image_copy3, diss):
-    font = cv2.FONT_HERSHEY_SIMPLEX
-    if diss:
-        if len(diss) == 1:
-            x1,x2,distancia = diss[0]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-        elif len(diss) == 2:
-            x1,x2,distancia = diss[0]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-            x1,x2,distancia = diss[1]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-        elif len(diss) == 3:
-            x1,x2,distancia = diss[0]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-            x1,x2,distancia = diss[1]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-            x1,x2,distancia = diss[2]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-        elif len(diss) == 4:
-            x1,x2,distancia = diss[0]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-            x1,x2,distancia = diss[1]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-            x1,x2,distancia = diss[2]
-            cv2.line(image_copy3,x1,x2,(0,255,255),2)
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
-            x4,y4,distancia = diss[3]
-            cv2.line(image_copy3,x4,y4,(0,255,255),2)  
-            cv2.putText(image_copy3,"{:.1f}".format(distancia),x4,font,1,(0,0,255),2,cv2.LINE_AA)      
-
-
-         
+    if diss:        
+        for lineas in arr:
+        x1,x2,distancia = lineas
+        cv2.line(img,x1,x2,(0,255,255),2)
+        cv2.putText(img,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
 
 def dibujar_circulos(pintados,img):
     for circle in pintados:
@@ -143,27 +88,23 @@ while cap.isOpened():
     cv2.namedWindow('Shi-tomasi Detecction')
     cv2.setMouseCallback('Shi-tomasi Detecction',dibujando)
     if complete:
-        dibujarLineas(frame, savedPointsReserve)
+        dibujarLineas(frame, savedPoints)
 
     dibujarLineasciclo(frame,distancias)
-    dibujar_circulos(savedPointsReserve, frame)
+    dibujar_circulos(savedPoints, frame)
     # Mostrar las esquinas detectadas
     cv2.imshow('Shi-tomasi Detecction', frame)
 
     # Salir del bucle si se presiona 'q'
-    k = cv2.waitKey(5) & 0xFF
-    if k == 27:
+    tecla = cv2.waitKey(5) & 0xFF
+    if tecla == 27:
         break
-    if k == ord('c'):
+    
+    # Limpia variables si apretas 'c'
+    if tecla == ord('c'):
         savedPoints = []
-        savedPointsReserve = []
-        copySavedPoints = []
         distancias = []
         liness = 0
-        d1 = True
-        d2 = True
-        d3 = True
-        d4 = True
         complete = True
 
 # Liberar recursos
