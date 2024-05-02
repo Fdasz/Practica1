@@ -61,7 +61,7 @@ def guardarPuntos(event, x, y, flags, param):
                     break
 #Calcula los extremos de los puntos junto con la distancia en milimetros
 def calculaLineas(puntos):
-    global complete
+    global complete, distancias
     if len(puntos) % 2 == 0 and len(puntos) <= 8:
         for i in range(0, len(puntos), 2):
             punto_inicio = puntos[i]
@@ -76,10 +76,10 @@ def calculaLineas(puntos):
 def dibujarLineas(img, diss):
     font = cv2.FONT_HERSHEY_SIMPLEX
     if diss:        
-        for lineas in arr:
-        x1,x2,distancia = lineas
-        cv2.line(img,x1,x2,(0,255,255),2)
-        cv2.putText(img,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
+        for lineas in diss:
+            x1,x2,distancia = lineas
+            cv2.line(img,x1,x2,(0,255,255),2)
+            cv2.putText(img,"{:.1f}".format(distancia),x1,font,1,(0,0,255),2,cv2.LINE_AA)
 #Dibuja en camara la posicion marcada
 def dibujarCirculos(pintados,img):
     for circle in pintados:
@@ -89,7 +89,7 @@ def iniciarExperimento(cruces):
     global experimento
     experimento = True
     with open("datosModa.txt", "a") as archivo:
-        archivo.write(f"{time.time()}}\n")
+        archivo.write(f"{time.time()}\n")
         for puntos in cruces:
             punto1,punto2 = puntos.ravel()
             archivo.write(f"{punto1},{punto2}\n")
@@ -116,7 +116,7 @@ while cap.isOpened():
     cv2.namedWindow('Grilla')
     cv2.setMouseCallback('Grilla',guardarPuntos)
     if complete:
-        calcularLineas(frame, savedPoints)
+        calculaLineas(frame, savedPoints)
     # Ciclo de dibujo
     dibujarLineas(frame,distancias)
     dibujarCirculos(savedPoints, frame)
@@ -141,3 +141,4 @@ while cap.isOpened():
 # Liberar recursos
 cap.release()
 cv2.destroyAllWindows()
+
