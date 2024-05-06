@@ -1,9 +1,14 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
+import matplotlib
+import matplotlib.pyplot as plt
 import cv2
 import numpy as np
 import math
+from tkinter import messagebox
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.figure import Figure
 
 # Código lobby
 lobby = Tk()
@@ -16,7 +21,6 @@ def camaraRapida(opcion_grilla, opcion_tiempo, opcion_probeta):
 
     if probeta < 0:
         print("Error al seleccionar la probeta")
-        exit()
         
     # Escribir los valores en un archivo de texto
     with open("datos_romper.txt", "w") as archivo:
@@ -30,16 +34,15 @@ def camaraRapida(opcion_grilla, opcion_tiempo, opcion_probeta):
     ventanaRapida.title("Rapida")
     ventanaRapida.geometry("1200x800")
 
-    botonTerminar = Button(ventanaRapida, text="Terminar", width=15, height=2, command=abrir_ventanaCrecer)
+    botonTerminar = Button(ventanaRapida, text="Terminar", width=15, height=2, command=lambda:abrir_ventanaCrecer)
     botonTerminar.grid(row=20, column=250, padx=50, pady=(400, 15))
 
 
-def camaraLenta(opcion_grilla, opcion_tiempo, opcion_probeta):
+def camaraLenta( opcion_grilla, opcion_tiempo, opcion_probeta):
     opcion_probeta = int(opcion_probeta)  # Convertir opcion_probeta a entero
 
     if opcion_probeta < 0:
         print("Error al seleccionar la probeta")
-        exit()
         
     # Escribir los valores en un archivo de texto
     with open("datos_crecer.txt", "w") as archivo:
@@ -54,11 +57,11 @@ def camaraLenta(opcion_grilla, opcion_tiempo, opcion_probeta):
     ventanaCrecer2.geometry("1200x800")
     
     #Botones // cambiar comando a funcion del programa
-    botonPunto1 = Button(ventanaCrecer2, text="Asignar", width=15, height=2, command=abrir_ventanaCrecer)
-    botonPunto2 = Button(ventanaCrecer2, text="Asignar", width=15, height=2, command=abrir_ventanaRomper)
-    botonPunto3 = Button(ventanaCrecer2, text="Asignar", width=15, height=2, command=abrir_ventanaCrecer)
-    botonPunto4 = Button(ventanaCrecer2, text="Asignar", width=15, height=2, command=abrir_ventanaRomper)
-    botonSiguienteV = Button(ventanaCrecer2, text="Siguiente", width=15, height=2, command=muestraCrecer(ventanaCrecer2))
+    botonPunto1 = Button(ventanaCrecer2, text="Asignar", width=15, height=2)    #AÑADIR COMANDO FIX
+    botonPunto2 = Button(ventanaCrecer2, text="Asignar", width=15, height=2)    #AÑADIR COMANDO FIX
+    botonPunto3 = Button(ventanaCrecer2, text="Asignar", width=15, height=2)    #AÑADIR COMANDO FIX
+    botonPunto4 = Button(ventanaCrecer2, text="Asignar", width=15, height=2)    #AÑADIR COMANDO FIX
+    botonSiguienteV = Button(ventanaCrecer2, text="Siguiente", width=15, height=2, command=lambda:muestraCrecer(ventanaCrecer2))
     botonPunto1.grid(row=200, column=50, padx=10, pady=(0, 15))
     botonPunto2.grid(row=200, column=100, padx=50, pady=(0, 15))
     botonPunto3.grid(row=200, column=150, padx=50, pady=(0, 15))
@@ -81,19 +84,13 @@ def camaraLenta(opcion_grilla, opcion_tiempo, opcion_probeta):
     textoPunto3.configure(state="disabled")
     textoPunto4.configure(state="disabled")
     
-    #añadir el def que haga que se escriban segun los puntos
+    #añadir el def que haga que se escriban segun los puntos FIX
 
 def muestraCrecer(ventanaActual):
     ventanaActual.withdraw()
     ventanaMuestraC = Toplevel(lobby)
     ventanaMuestraC.title("Crecer Muestra")
     ventanaMuestraC.geometry("1200x800")
-    
-    
-    #boton
-    #cambiar a funcion siguiente
-    botonTerminar = Button(ventanaMuestraC, text="Terminar", width=15, height=2, command=graficosLento)
-    botonTerminar.grid(row=20, column=250, padx=50, pady=(400, 15))
     
     #textos
     textoPunto1 = tk.Text(ventanaMuestraC, wrap="word", height=5, width=30)
@@ -110,6 +107,11 @@ def muestraCrecer(ventanaActual):
     textoPunto2.configure(state="disabled")
     textoPunto3.configure(state="disabled")
     textoPunto4.configure(state="disabled")
+    
+    #boton
+    botonTerminar = Button(ventanaMuestraC, text="Terminar", width=15, height=2, command=lambda: graficosLento())
+    botonTerminar.grid(row=20, column=250, padx=50, pady=(400, 15))
+    #FIX hacer que cambien los textos a la info de la imagen
 
     
 def abrir_ventanaCrecer():
@@ -182,11 +184,19 @@ def graficosLento():
     #ventana
     ventanaGraficosL = Toplevel(lobby)
     ventanaGraficosL.title("Graficos")
-    ventanaGraficosL.geometry("300x400")
+    ventanaGraficosL.geometry("800x800")
+    
+    fig = crear_graficos()
+    canvas = FigureCanvasTkAgg(fig, master=ventanaGraficosL)
+    canvas.draw()
+    canvas.get_tk_widget().pack(side=tk.TOP, fill=tk.BOTH, expand=1)
     
     #boton
-    botonTerminar = Button(ventanaGraficosL, text="Terminar", width=15, height=2, command=graficosLento)
-    botonTerminar.grid(row=20, column=250, padx=50, pady=(400, 15))
+    btn1 = tk.Button(ventanaGraficosL, text="Finalizar") #añadir comando FIX
+    btn1.pack(side=tk.RIGHT, padx=5, pady=10)
+    
+    btn2 = tk.Button(ventanaGraficosL, text="Cambiar datos") #AÑADIR COMANDO FIX
+    btn2.pack(side=tk.RIGHT, padx=5, pady=10)
 
 def abrirSiguienteVentanaLenta(ventana_actual, opcion_grilla, opcion_tiempo, opcion_probeta):
     ventana_actual.withdraw()  # Ocultar la ventana actual
@@ -195,6 +205,28 @@ def abrirSiguienteVentanaLenta(ventana_actual, opcion_grilla, opcion_tiempo, opc
 def abrirSiguienteVentanaRapida(ventana_actual, opcion_grilla, opcion_tiempo, opcion_probeta):
     ventana_actual.withdraw()  # Ocultar la ventana actual
     camaraRapida(opcion_grilla, opcion_tiempo, opcion_probeta)
+    
+def crear_graficos():
+    fig = Figure(figsize=(5, 4), dpi=100)
+    
+    # Gráfico 1
+    ax1 = fig.add_subplot(221)
+    ax1.plot(np.random.rand(5))
+    
+    # Gráfico 2
+    ax2 = fig.add_subplot(222)
+    ax2.plot(np.random.rand(5))
+    
+    # Gráfico 3
+    ax3 = fig.add_subplot(223)
+    ax3.plot(np.random.rand(5))
+    
+    # Gráfico 4
+    ax4 = fig.add_subplot(224)
+    ax4.plot(np.random.rand(5))
+    
+    return fig
+    
         
 # Botones lobby
 botonCrecer = Button(lobby, text="Crecer", width=15, height=2, command=abrir_ventanaCrecer)
