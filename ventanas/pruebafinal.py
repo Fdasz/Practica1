@@ -217,26 +217,24 @@ def mostrarDatos():
     tiempos = []
     posiciones = []
 
-    # Procesar las líneas para extraer tiempo en segundos
+    # Procesar las líneas para extraer tiempo en segundos y posición
     for line in lines:
         parts = line.split()
-        tiempo_total_segundos = 0 
-        distancia = 0
         try:
             distancia = float(parts[4])
             tiempo_str = parts[5]
             minutos, segundos = map(float, tiempo_str.split(':'))
             tiempo_total_segundos = minutos * 60 + segundos
+
+            # Agregar los datos a las listas
+            tiempos.append(tiempo_total_segundos)
+            posiciones.append(distancia)
         except Exception as e:
             print(f"Error al procesar la línea: {line}. Error: {e}")
             continue
 
-    # Aquí puedes usar 'tiempo_total_segundos' como necesites
-    tiempos.append(tiempo_total_segundos)
-    posiciones.append(distancia) # Usamos la distancia como la posición relativa
-
     # Crear una nueva ventana para los gráficos
-    grafico_ventana = tk.Toplevel(root)
+    grafico_ventana = tk.Toplevel()
     grafico_ventana.title("Gráfico de Datos")
 
     # Crear figura de Matplotlib
@@ -252,7 +250,7 @@ def mostrarDatos():
 
     # Ajustar los límites de los ejes
     plot.set_xlim(0, max(tiempos))  # Empieza el tiempo desde 0
-    plot.set_ylim(-3, 3)  # Establece la escala para la distancia de -3 a 3
+    plot.set_ylim(min(posiciones) - 1, max(posiciones) + 1)  # Ajusta la escala dinámicamente
 
     # Mostrar el gráfico en la nueva ventana
     canvas = FigureCanvasTkAgg(fig, master=grafico_ventana)
@@ -279,8 +277,6 @@ boton_iniciar.pack(pady=20)
 # Botón para abrir el archivo y mostrar los gráficos
 boton_mostrar_datos = ttk.Button(frame, text="Mostrar Datos", width=15, command=mostrarDatos)
 boton_mostrar_datos.pack(pady=20)
-
-
 
 # Iniciar el bucle principal de Tkinter
 root.mainloop()
