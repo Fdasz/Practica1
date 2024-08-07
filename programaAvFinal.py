@@ -353,7 +353,8 @@ def mostrarAyuda():
         2.Una vez hecho esto debera determinar los puntos a examinar, haciendo click izquierdo sobre los puntos verdes.
 
         3.Una vez tengo los 4 pares de puntos, al apretar la tecla "i" se empezara a guardar los datos en un archivo txt
-        el cual quedara guardado en la locacion del programa.
+        el cual quedara guardado en la locacion del programa, se creara un archivo con los datos resumidos y otro con 
+        los datos enteros, cuando no se quieran registrar mas datos apretar la tecla "w" para detener la medicion.
 
         3,5.Si se equivoco al momento de elegir los puntos o al momento de establecer la distancia la tecla "c" devuelve todo a los
         valores a cero.
